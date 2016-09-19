@@ -7,7 +7,9 @@ read(file, 'utf8', function(err, buffer){
   var res = processer.parser.doValidate();
 
   if (true === res.result) {
-    processer.parser.getSnapshot(historyData, id);
+    var snaps = processer.parser.getSnapshot(parsedData.ids[2]);
+    console.log("Result: =====================================");
+    console.log(snaps);
   } else {
     console.log(res.message);
   }

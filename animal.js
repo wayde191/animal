@@ -1,14 +1,18 @@
-var Animal = function(id, data){
+var Animal = function(id, data, step){
   this.id = id;
   this.data = data;
   this.name = null;
-  this.x = null;
-  this.y = null;
-  this.xOffset = null;
-  this.yOffset = null;
+  this.x = 0;
+  this.y = 0;
+  this.xOffset = 0;
+  this.yOffset = 0;
   this.firstTime = false;
+  this.prevNode = null;
+  this.nextNode = null;
+  this.step = step;
   this.setupData();
 };
+
 Animal.prototype.setupData = function () {
   var datas = this.data.split(' ');
   this.name = datas[0];
@@ -21,10 +25,16 @@ Animal.prototype.setupData = function () {
     this.firstTime = false;
   }
 };
+
+Animal.prototype.setupChain = function(prev, next) {
+  this.prevNode = prev;
+  this.nextNode = next;
+}
+
 Animal.prototype.getPathEndPoint = function(){
   return this.firstTime ? {x: this.x, y: this.y} : {x: (this.x + this.xOffset), y: (this.y + this.yOffset)}
 };
 
-exports.init = function(id, data){
-  return new Animal(id, data);
+exports.init = function(id, data, step){
+  return new Animal(id, data, step);
 };

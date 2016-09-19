@@ -12,15 +12,37 @@ function toJson(data){
 
   var recs = [];
   _.each(datas, function(value, index){
-    recs.push(Record.init(ids[index], value));
+    recs.push(Record.init(ids[index], value, index));
   });
 
   return recs;
 };
 
+function buildRecordsRelationship() {
+  var theData = getTracks();
+  var tracks = theData.tracks;
+  var names = theData.names;
+
+  _.each(names, function(name, index) {
+    _.each(records, function(record, index) {
+      var prevRecord = (0 === index ? null : records[index - 1]);
+      var prevAnimal = prevRecord === null ? null : prevRecord.getAnimalByName(name);
+      var nextRecord = (records.length === (index + 1) ? null : records[index + 1]);
+      var nextAnimal = nextRecord === null ? null : nextRecord.getAnimalByName(name);
+
+      var currentAnimal = record.getAnimalByName(name);
+      if(currentAnimal){
+        currentAnimal.setupChain(prevAnimal, nextAnimal);
+      }
+
+    });
+  });
+}
+
 function initData(data){
   ids = data.match(reg);
   records = toJson(data);
+  buildRecordsRelationship();
 
   return {
     ids: ids,
@@ -28,11 +50,10 @@ function initData(data){
   };
 };
 
-function doValidate(){
-  var result = true;
+
+function getTracks(){
   var tracks = {};
   var names = [];
-  var message = '';
 
   _.each(records, function(record, index){
     _.each(record.animals, function(animal, index){
@@ -43,6 +64,44 @@ function doValidate(){
       tracks[animal.name].push(animal);
     });
   });
+
+  return {tracks: tracks, names: names};
+};
+
+function getSnapshot(id){
+  var theData = getTracks();
+  var tracks = theData.tracks;
+  var names = theData.names;
+  var theStep = _.indexOf(ids, id);
+
+  var endPoints = {};
+  _.each(names, function(name){
+    endPoints[name] = {x:0, y:0};
+    var currentNode = _.first(tracks[name]);
+    while( currentNode != null && currentNode.step <= theStep ){
+      endPoints[name]['x'] = currentNode.x + currentNode.xOffset;
+      endPoints[name]['y'] = currentNode.y + currentNode.yOffset;
+      currentNode = currentNode.nextNode;
+    }
+  });
+
+  var outputStr = '';
+  _.each(names, function(name, index) {
+    outputStr += name + ' ' + endPoints[name]['x'] + ' ' + endPoints[name]['y'] + '\n';
+  });
+
+  return outputStr;
+};
+
+function doValidate(){
+  var result = true;
+  var tracks = {};
+  var names = [];
+  var message = '';
+
+  var theData = getTracks();
+  tracks = theData.tracks;
+  names = theData.names;
 
   _.each(names, function(name, index){
     var paths = tracks[name];
@@ -62,17 +121,8 @@ function doValidate(){
   return {result: result, message: message};
 };
 
-function getIds() {
-  return ids;
-};
-
-function getRecords() {
-  return records;
-}
-
 exports.parser = {
-  getIds: getIds,
-  getRecords: getRecords,
   initData: initData,
-  doValidate: doValidate
+  doValidate: doValidate,
+  getSnapshot: getSnapshot
 };

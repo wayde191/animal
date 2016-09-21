@@ -76,18 +76,19 @@ function getSnapshot(id){
 
   var endPoints = {};
   _.each(names, function(name){
-    endPoints[name] = {x:0, y:0};
+    endPoints[name] = {x:0, y:0, h:0};
     var currentNode = _.first(tracks[name]);
     while( currentNode != null && currentNode.step <= theStep ){
       endPoints[name]['x'] = currentNode.x + currentNode.xOffset;
       endPoints[name]['y'] = currentNode.y + currentNode.yOffset;
+      endPoints[name]['h'] = currentNode.h + currentNode.hOffset;
       currentNode = currentNode.nextNode;
     }
   });
 
   var outputStr = '';
   _.each(names, function(name, index) {
-    outputStr += name + ' ' + endPoints[name]['x'] + ' ' + endPoints[name]['y'] + '\n';
+    outputStr += name + ' ' + endPoints[name]['x'] + ' ' + endPoints[name]['y'] + ' ' + endPoints[name]['h'] + '\n';
   });
 
   return outputStr;
@@ -109,7 +110,7 @@ function doValidate(){
       if(path.firstTime === false){
         var prePath = paths[index - 1];
         var preEndPoint = prePath.getPathEndPoint();
-        if(false === (path.x === preEndPoint.x && path.y === preEndPoint.y)){
+        if(false === (path.x === preEndPoint.x && path.y === preEndPoint.y && path.h === preEndPoint.h)){
           result = false;
           message = "Confict found at " + path.id;
           return;

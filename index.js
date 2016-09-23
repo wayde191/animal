@@ -1,6 +1,6 @@
 var processer = require('./parser');
 var read = require('read-file');
-var file = 'heart.json';
+var file = 'data.json';
 
 read(file, 'utf8', function(err, buffer){
   var parsedData = processer.parser.initData(buffer.trim());

@@ -76,11 +76,12 @@ function getSnapshot(id){
 
   var endPoints = {};
   _.each(names, function(name){
-    endPoints[name] = {x:0, y:0, fx:0, fy:0};
+    endPoints[name] = {x:0, y:0, fx:0, fy:0, moveDis:0, name:name};
     var currentNode = _.first(tracks[name]);
     while( currentNode != null && currentNode.step <= theStep ){
       endPoints[name]['x'] = currentNode.x + currentNode.xOffset;
       endPoints[name]['y'] = currentNode.y + currentNode.yOffset;
+      endPoints[name]['moveDis'] += Math.abs(currentNode.xOffset) + Math.abs(currentNode.yOffset);
       if (true == currentNode.firstTime) {
         endPoints[name]['fx'] = currentNode.x;
         endPoints[name]['fy'] = currentNode.y;
@@ -99,7 +100,13 @@ function getSnapshot(id){
         + '\n';
   });
 
-  return outputStr;
+  var maxDistanceAnimal = _.max(_.values(endPoints), function(obj){
+    return obj.moveDis;
+  });
+
+  return outputStr
+      + maxDistanceAnimal.name
+      + '\n';
 };
 
 function doValidate(){

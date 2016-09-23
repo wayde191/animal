@@ -76,18 +76,27 @@ function getSnapshot(id){
 
   var endPoints = {};
   _.each(names, function(name){
-    endPoints[name] = {x:0, y:0};
+    endPoints[name] = {x:0, y:0, fx:0, fy:0};
     var currentNode = _.first(tracks[name]);
     while( currentNode != null && currentNode.step <= theStep ){
       endPoints[name]['x'] = currentNode.x + currentNode.xOffset;
       endPoints[name]['y'] = currentNode.y + currentNode.yOffset;
+      if (true == currentNode.firstTime) {
+        endPoints[name]['fx'] = currentNode.x;
+        endPoints[name]['fy'] = currentNode.y;
+      }
       currentNode = currentNode.nextNode;
     }
   });
 
   var outputStr = '';
   _.each(names, function(name, index) {
-    outputStr += name + ' ' + endPoints[name]['x'] + ' ' + endPoints[name]['y'] + '\n';
+    outputStr += name
+        + ' ' + endPoints[name]['x']
+        + ' ' + endPoints[name]['y']
+        + ' ' + endPoints[name]['fx']
+        + ' ' + endPoints[name]['fy']
+        + '\n';
   });
 
   return outputStr;
